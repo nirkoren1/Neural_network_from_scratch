@@ -36,7 +36,7 @@ public class XorEx {
         model.add(20, new Sigmoid());
         model.add(1, new Sigmoid());
 
-        model.trainModel(X, Y, 50);
+        model.trainModel(X, Y, 300);
         System.out.println("----------TEST-----------");
         for (int i = 0; i < 20; i++) {
             int rand = random.nextInt(1000);
