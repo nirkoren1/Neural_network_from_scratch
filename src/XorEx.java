@@ -21,7 +21,7 @@ public class XorEx {
             }
             X.add(x);
             Matrix y = new Matrix(1, 1);
-            if (Math.abs(x.getValues()[0][0] - x.getValues()[1][0]) < 0.1) {
+            if (Math.abs(x.getValues()[0][0] - x.getValues()[1][0]) == 0.0) {
                 y.getValues()[0][0] = -1.0;
             } else {
                 y.getValues()[0][0] = 1.0;
@@ -29,21 +29,34 @@ public class XorEx {
             Y.add(y);
         }
 
-        Model model = new Model(16, new MSE(), 0.03);
+        Model model = new Model(16, new MSE(), 0.01);
         model.add(2, new Relu());
-        model.add(20, new Sigmoid());
-        model.add(60, new Sigmoid());
-        model.add(20, new Sigmoid());
+        model.add(16, new Relu());
+        model.add(32, new Sigmoid());
+        model.add(64, new Sigmoid());
+        model.add(32, new Sigmoid());
+        model.add(16, new Sigmoid());
         model.add(1, new Sigmoid());
 
-        model.trainModel(X, Y, 300);
+        model.trainModel(X, Y, 200);
         System.out.println("----------TEST-----------");
-        for (int i = 0; i < 20; i++) {
+        List<Matrix> XTest = new ArrayList<>();
+        List<Matrix> YTest = new ArrayList<>();
+        double totalError = 0;
+        int testSize = 20;
+        for (int i = 0; i < testSize; i++) {
             int rand = random.nextInt(1000);
-            System.out.println(X.get(rand));
-            System.out.println(Y.get(rand));
-            System.out.println(model.feedForward(X.get(rand)));
+            XTest.add(X.get(rand));
+            YTest.add(Y.get(rand));
             System.out.println("---------------------");
         }
+        for (int i = 0; i < testSize; i++) {
+            System.out.println(XTest.get(i));
+            System.out.println(YTest.get(i));
+            System.out.println(model.feedForward(XTest.get(i)));
+            totalError += Math.abs(model.feedForward(XTest.get(i)).getValues()[0][0] - YTest.get(i).getValues()[0][0]);
+        }
+        totalError /= testSize;
+        System.out.println("Total error = " + totalError);
     }
 }

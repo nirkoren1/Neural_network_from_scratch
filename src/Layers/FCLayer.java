@@ -79,8 +79,8 @@ public class FCLayer implements Layer {
     }
 
     public void updateParameters(double alpha, int batchSize) {
-        this.gradientW = Matrix.multiply(this.gradientW, -1 * alpha * (1 / batchSize));
-        this.gradientB = Matrix.multiply(this.gradientB, -1 * alpha * (1 / batchSize));
+        this.gradientW = Matrix.multiply(this.gradientW, -1 * alpha * (1 / (double) batchSize));
+        this.gradientB = Matrix.multiply(this.gradientB, -1 * alpha * (1 / (double) batchSize));
         this.weights = Matrix.add(this.weights, this.gradientW);
         this.biases = Matrix.add(this.biases, this.gradientB);
     }

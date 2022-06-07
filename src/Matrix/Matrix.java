@@ -23,7 +23,9 @@ public class Matrix implements IMatrix {
         this.columns = columns;
         this.values = new Double[rows][columns];
         for (int i = 0; i < rows; i++) {
-            System.arraycopy(values[i], 0, this.values[i], 0, columns);
+            for (int j = 0; j < columns; j++) {
+                this.values[i][j] = values[i][j];
+            }
         }
     }
     @Override
