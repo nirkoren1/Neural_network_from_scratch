@@ -31,7 +31,7 @@ public class XorEx {
 
         Model model = new Model(16, new MSE(), 0.05);
         model.add(2, new Relu());
-        model.add(8, new Relu());
+        model.add(16, new Relu());
         model.add(16, new Sigmoid());
         model.add(1, new Sigmoid());
 
