@@ -29,16 +29,13 @@ public class XorEx {
             Y.add(y);
         }
 
-        Model model = new Model(16, new MSE(), 0.01);
+        Model model = new Model(16, new MSE(), 0.05);
         model.add(2, new Relu());
-        model.add(16, new Relu());
-        model.add(32, new Sigmoid());
-        model.add(64, new Sigmoid());
-        model.add(32, new Sigmoid());
+        model.add(8, new Relu());
         model.add(16, new Sigmoid());
         model.add(1, new Sigmoid());
 
-        model.trainModel(X, Y, 200);
+        model.trainModel(X, Y, 1000);
         System.out.println("----------TEST-----------");
         List<Matrix> XTest = new ArrayList<>();
         List<Matrix> YTest = new ArrayList<>();
@@ -48,12 +45,12 @@ public class XorEx {
             int rand = random.nextInt(1000);
             XTest.add(X.get(rand));
             YTest.add(Y.get(rand));
-            System.out.println("---------------------");
         }
         for (int i = 0; i < testSize; i++) {
             System.out.println(XTest.get(i));
             System.out.println(YTest.get(i));
             System.out.println(model.feedForward(XTest.get(i)));
+            System.out.println("---------------------");
             totalError += Math.abs(model.feedForward(XTest.get(i)).getValues()[0][0] - YTest.get(i).getValues()[0][0]);
         }
         totalError /= testSize;
