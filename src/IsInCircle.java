@@ -28,15 +28,16 @@ public class IsInCircle {
             Y.add(y);
         }
 
-        Model model = new Model(16, new MSE(), 0.05);
+        Model model = new Model(64, new MSE(), 0.05);
         model.add(2, new Relu());
         model.add(16, new Relu());
         model.add(32, new Sigmoid());
+        model.add(64, new Sigmoid());
         model.add(32, new Sigmoid());
         model.add(16, new Sigmoid());
         model.add(1, new Sigmoid());
 
-        model.trainModel(X, Y, 500);
+        model.trainModel(X, Y, 50);
         System.out.println("----------TEST-----------");
         List<Matrix> XTest = new ArrayList<>();
         List<Matrix> YTest = new ArrayList<>();
@@ -56,6 +57,10 @@ public class IsInCircle {
             }
             YTest.add(y);
         }
+
+        double avgErrorRadius = 0;
+        int numOfError = 0;
+
         for (int i = 0; i < testSize; i++) {
 //            System.out.println(XTest.get(i));
 //            System.out.println(YTest.get(i));
@@ -67,12 +72,15 @@ public class IsInCircle {
                 accuracy += 1;
             } else {
                 System.out.println(XTest.get(i));
+                avgErrorRadius += Math.pow(Math.pow(XTest.get(i).getValues()[0][0], 2) + Math.pow(XTest.get(i).getValues()[1][0], 2), 0.5);
+                numOfError += 1;
                 System.out.println(YTest.get(i));
                 System.out.println(xPredict);
                 System.out.println("---------------------");
             }
         }
         accuracy /= testSize;
-        System.out.println("Total accuracy = " + accuracy);
+        avgErrorRadius /= numOfError;
+        System.out.println("Total accuracy = " + accuracy + "  avg radius of error = " + avgErrorRadius);
     }
 }

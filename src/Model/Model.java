@@ -42,24 +42,21 @@ public class Model {
         return result;
     }
 
-    public void backPorpegateSample(Matrix inputs, Matrix realValue) {
+    public double backPorpegateSample(Matrix inputs, Matrix realValue) {
         Matrix result = this.feedForward(inputs.copy());
-        this.layers.get(this.layers.size() - 1).derivativeLayer(this.costFunction.cost(result, realValue.copy()));
+        this.layers.get(this.layers.size() - 1).derivativeLayer(this.costFunction.derCost(result, realValue.copy()));
+        return this.costFunction.cost(result.copy(), realValue.copy());
     }
-
+    double totalError = 0;
     public void backPorpegateBatch(List<Matrix> predictedBatch, List<Matrix> realValueBatch) {
         for (Layer layer: this.layers) {
             layer.initGradients();
         }
         for (int i = 0; i < this.batchSize; i++) {
-            backPorpegateSample(predictedBatch.get(i), realValueBatch.get(i));
+            totalError += backPorpegateSample(predictedBatch.get(i), realValueBatch.get(i));
         }
         for (Layer layer: this.layers) {
             layer.updateParameters(this.learningRate, this.batchSize);
-        }
-        double totalError = 0;
-        for (int i = 0; i < this.batchSize; i++) {
-            totalError += Math.abs(this.feedForward(predictedBatch.get(i)).getValues()[0][0] - realValueBatch.get(i).getValues()[0][0]);
         }
         totalError /= this.batchSize;
         System.out.println(" Total error = " + totalError);
