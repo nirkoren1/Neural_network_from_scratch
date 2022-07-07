@@ -32,8 +32,8 @@ public class IsInCircle {
         model.add(2, new Relu());
         model.add(16, new Relu());
         model.add(32, new Sigmoid());
-        model.add(64, new Sigmoid());
-        model.add(32, new Sigmoid());
+//        model.add(64, new Sigmoid());
+//        model.add(32, new Sigmoid());
         model.add(16, new Sigmoid());
         model.add(1, new Sigmoid());
 
