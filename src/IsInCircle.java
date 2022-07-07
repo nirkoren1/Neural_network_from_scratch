@@ -82,5 +82,23 @@ public class IsInCircle {
         accuracy /= testSize;
         avgErrorRadius /= numOfError;
         System.out.println("Total accuracy = " + accuracy + "  avg radius of error = " + avgErrorRadius);
+        // write the points to a file
+        Double[] xPredictsTrue = new Double[testSize];
+        Double[] yPredictsTrue = new Double[testSize];
+        Double[] xPredictsFalse = new Double[testSize];
+        Double[] yPredictsFalse = new Double[testSize];
+        for (int i = 0; i < testSize; i++) {
+            if (model.feedForward(XTest.get(i)).getValues()[0][0] > 0) {
+                xPredictsTrue[i] = XTest.get(i).getValues()[0][0];
+                yPredictsTrue[i] = XTest.get(i).getValues()[1][0];
+            } else {
+                xPredictsFalse[i] = XTest.get(i).getValues()[0][0];
+                yPredictsFalse[i] = XTest.get(i).getValues()[1][0];
+            }
+        }
+        PointsWriter pointsWriter = new PointsWriter(xPredictsTrue, yPredictsTrue, testSize, "predicted-true.txt");
+        pointsWriter.writePoints();
+        pointsWriter = new PointsWriter(xPredictsFalse, yPredictsFalse, testSize, "predicted-false.txt");
+        pointsWriter.writePoints();
     }
 }

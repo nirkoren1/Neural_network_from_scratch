@@ -1,5 +1,5 @@
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 // this class can write points to a file
 public class PointsWriter {
@@ -17,26 +17,18 @@ public class PointsWriter {
     }
     public void writePoints() {
         try {
-            FileWriter fw = new FileWriter(filePath);
-            for (int i = 0; i < size; i++) {
-                fw.write(x[i] + " " + y[i] + "\n");
+            File file = new File(filePath);
+            if (!file.exists()) {
+                file.createNewFile();
             }
-            fw.close();
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            for (int i = 0; i < size; i++) {
+                bw.write(x[i] + " " + y[i] + "\n");
+            }
+            bw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-    public void plotPoints() {
-        String command = "python3 src/plotPoints.py";
-        try {
-            Process p = Runtime.getRuntime().exec(command);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void main(String[] args) {
-        PointsWriter pointsWriter = new PointsWriter(new Double[]{}, new Double[]{}, 5, "plotPoints");
-        pointsWriter.plotPoints();
     }
 }
