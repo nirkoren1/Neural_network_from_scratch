@@ -2,15 +2,71 @@ import Functions.MSE;
 import Functions.Relu;
 import Functions.Sigmoid;
 import Matrix.Matrix;
-import Model.Model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class IsInCircle {
+    private static double radius = 11.0;
+    private static double circleX = 0;
+    private static double circleY = 0;
     private static Random random = new Random();
+    private static List<Matrix> XTestE = new ArrayList<>();
+    private static List<Matrix> YTestE = new ArrayList<>();
+
+    private static void initTestData() {
+        int testSize = 1000;
+        for (int i = 0; i < testSize; i++) {
+            Matrix x = new Matrix(2, 1);
+            for (int j = 0; j < 2; j++) {
+                x.getValues()[j][0] = -16 + 32 * random.nextDouble();
+            }
+            XTestE.add(x);
+            Matrix y = new Matrix(1, 1);
+            if (Math.pow(Math.pow(x.getValues()[0][0] - circleX, 2) + Math.pow(x.getValues()[1][0] - circleY, 2), 0.5) > radius) {
+                y.getValues()[0][0] = -1.0;
+            } else {
+                y.getValues()[0][0] = 1.0;
+            }
+            YTestE.add(y);
+        }
+    }
+
+    public static void writePointFile(Model model, int index) {
+        double accuracy = 0;
+        int testSize = 1000;
+        for (int i = 0; i < testSize; i++) {
+            double xPredict = model.feedForward(XTestE.get(i)).getValues()[0][0];
+            double yTrue = YTestE.get(i).getValues()[0][0];
+            if ((xPredict < 0 && yTrue < 0) || (xPredict > 0 && yTrue > 0)) {
+                accuracy += 1;
+            }
+        }
+        accuracy /= testSize;
+        System.out.println("epoch accuracy = " + accuracy);
+        // write the points to a file
+        Double[] xPredictsTrue = new Double[testSize];
+        Double[] yPredictsTrue = new Double[testSize];
+        Double[] xPredictsFalse = new Double[testSize];
+        Double[] yPredictsFalse = new Double[testSize];
+        for (int i = 0; i < testSize; i++) {
+            if (model.feedForward(XTestE.get(i)).getValues()[0][0] > 0) {
+                xPredictsTrue[i] = XTestE.get(i).getValues()[0][0];
+                yPredictsTrue[i] = XTestE.get(i).getValues()[1][0];
+            } else {
+                xPredictsFalse[i] = XTestE.get(i).getValues()[0][0];
+                yPredictsFalse[i] = XTestE.get(i).getValues()[1][0];
+            }
+        }
+        PointsWriter pointsWriter = new PointsWriter(xPredictsTrue, yPredictsTrue, testSize, "predicted-true-" + index);
+        pointsWriter.writePoints();
+        pointsWriter = new PointsWriter(xPredictsFalse, yPredictsFalse, testSize, "predicted-false-" + index);
+        pointsWriter.writePoints();
+    }
+
     public static void main(String[] args) {
+        initTestData();
         List<Matrix> X = new ArrayList<>();
         List<Matrix> Y = new ArrayList<>();
         for (int i = 0; i < 10000; i++) {
@@ -20,7 +76,7 @@ public class IsInCircle {
             }
             X.add(x);
             Matrix y = new Matrix(1, 1);
-            if (Math.pow(Math.pow(x.getValues()[0][0], 2) + Math.pow(x.getValues()[1][0], 2), 0.5) > 9.0) {
+            if (Math.pow(Math.pow(x.getValues()[0][0] - circleX, 2) + Math.pow(x.getValues()[1][0] - circleY, 2), 0.5) > radius) {
                 y.getValues()[0][0] = -1.0;
             } else {
                 y.getValues()[0][0] = 1.0;
@@ -37,7 +93,7 @@ public class IsInCircle {
         model.add(16, new Sigmoid());
         model.add(1, new Sigmoid());
 
-        model.trainModel(X, Y, 50);
+        model.trainModel(X, Y, 300);
         System.out.println("----------TEST-----------");
         List<Matrix> XTest = new ArrayList<>();
         List<Matrix> YTest = new ArrayList<>();
@@ -50,7 +106,7 @@ public class IsInCircle {
             }
             XTest.add(x);
             Matrix y = new Matrix(1, 1);
-            if (Math.pow(Math.pow(x.getValues()[0][0], 2) + Math.pow(x.getValues()[1][0], 2), 0.5) > 9.0) {
+            if (Math.pow(Math.pow(x.getValues()[0][0] - circleX, 2) + Math.pow(x.getValues()[1][0] - circleY, 2), 0.5) > radius) {
                 y.getValues()[0][0] = -1.0;
             } else {
                 y.getValues()[0][0] = 1.0;
@@ -72,7 +128,7 @@ public class IsInCircle {
                 accuracy += 1;
             } else {
                 System.out.println(XTest.get(i));
-                avgErrorRadius += Math.pow(Math.pow(XTest.get(i).getValues()[0][0], 2) + Math.pow(XTest.get(i).getValues()[1][0], 2), 0.5);
+                avgErrorRadius += Math.pow(Math.pow(XTest.get(i).getValues()[0][0] - circleX, 2) + Math.pow(XTest.get(i).getValues()[1][0] - circleY, 2), 0.5);
                 numOfError += 1;
                 System.out.println(YTest.get(i));
                 System.out.println(xPredict);

@@ -3,7 +3,6 @@ import Functions.None;
 import Functions.Relu;
 import Functions.Sigmoid;
 import Matrix.Matrix;
-import Model.Model;
 
 import java.util.ArrayList;
 import java.util.List;

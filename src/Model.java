@@ -1,12 +1,9 @@
-package Model;
-
 import Functions.CostFunction;
 import Functions.Function;
 import Layers.FCLayer;
 import Layers.InputLayer;
 import Layers.Layer;
 import Matrix.Matrix;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -58,8 +55,8 @@ public class Model {
         for (Layer layer: this.layers) {
             layer.updateParameters(this.learningRate, this.batchSize);
         }
-        totalError /= this.batchSize;
-        System.out.println(" Total error = " + totalError);
+//        totalError /= this.batchSize;
+//        System.out.println(" Total error = " + totalError);
     }
 
     public void trainModel(List<Matrix> inputs, List<Matrix> realValues, int epochs) {
@@ -71,8 +68,9 @@ public class Model {
                 batchInputs.add(inputs.get(randIndex));
                 batchRealValues.add(realValues.get(randIndex));
             }
-            System.out.print("epoch: " + j);
+            System.out.print("epoch: " + j + " ");
             this.backPorpegateBatch(batchInputs, batchRealValues);
+            IsInCircle.writePointFile(this, j);
         }
     }
 }
