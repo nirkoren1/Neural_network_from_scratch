@@ -1,5 +1,7 @@
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 // this class can write points to a file
 public class PointsWriter {
@@ -13,7 +15,7 @@ public class PointsWriter {
         this.y = y;
         this.size = size;
         this.fileName = fileName;
-        this.filePath = "src/Points/" + fileName + ".txt";
+        this.filePath = "src/Points2/" + fileName + ".txt";
     }
     public void writePoints() {
         try {

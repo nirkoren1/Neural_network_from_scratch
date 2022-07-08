@@ -55,8 +55,8 @@ public class Model {
         for (Layer layer: this.layers) {
             layer.updateParameters(this.learningRate, this.batchSize);
         }
-//        totalError /= this.batchSize;
-//        System.out.println(" Total error = " + totalError);
+        totalError /= this.batchSize;
+        System.out.println(" Total error = " + totalError);
     }
 
     public void trainModel(List<Matrix> inputs, List<Matrix> realValues, int epochs) {
@@ -70,7 +70,7 @@ public class Model {
             }
             System.out.print("epoch: " + j + " ");
             this.backPorpegateBatch(batchInputs, batchRealValues);
-            IsInCircle.writePointFile(this, j);
+            RegressionEx.writePointFile(this, j);
         }
     }
 }
