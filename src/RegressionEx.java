@@ -1,7 +1,6 @@
 import Functions.MSE;
 import Functions.None;
 import Functions.Relu;
-import Functions.Sigmoid;
 import Matrix.Matrix;
 
 import java.util.ArrayList;
@@ -37,21 +36,10 @@ public class RegressionEx {
             }
             X.add(x);
             Matrix y = new Matrix(1, 1);
-            y.getValues()[0][0] = 2 * x.getValues()[0][0] + 1;
+            y.getValues()[0][0] = 2 * Math.pow(x.getValues()[0][0], 2) + 1;
             Y.add(y);
         }
 
-        Model model = new Model(16, new MSE(), 0.0005);
-        model.add(1, new Relu());
-        model.add(16, new Sigmoid());
-//        model.add(32, new Sigmoid());
-//        model.add(32, new Sigmoid());
-        model.add(16, new Sigmoid());
-        model.add(1, new None());
-
-        model.trainModel(X, Y, 200);
-
-        System.out.println("----------TEST-----------");
         List<Matrix> XTest = new ArrayList<>();
         List<Matrix> YTest = new ArrayList<>();
         int testSize = 1000;
@@ -62,15 +50,28 @@ public class RegressionEx {
             }
             XTest.add(x);
             Matrix y = new Matrix(1, 1);
-            y.getValues()[0][0] = 2 * x.getValues()[0][0] + 1;
+            y.getValues()[0][0] = 2 * Math.pow(x.getValues()[0][0], 2) + 1;
             YTest.add(y);
         }
+
+
+        Model model = new Model(16, new MSE(), 0.05);
+        model.add(1, new Relu());
+        model.add(16, new Relu());
+//        model.add(32, new Relu());
+//        model.add(32, new Relu());
+        model.add(16, new Relu());
+        model.add(1, new None());
+
+        model.trainModel(X, Y, 200, XTest, YTest);
+
+        System.out.println("----------TEST-----------");
 
         double avgError = 0;
         for (int i = 0; i < testSize; i++) {
             double xPredict = model.feedForward(XTest.get(i)).getValues()[0][0];
             double yTrue = YTest.get(i).getValues()[0][0];
-            avgError += Math.abs(xPredict - yTrue);
+            avgError += Math.pow(xPredict - yTrue, 2);
             System.out.println(XTest.get(i));
             System.out.println(yTrue);
             System.out.println(xPredict);

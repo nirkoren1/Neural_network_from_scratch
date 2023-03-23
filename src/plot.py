@@ -8,9 +8,9 @@ all_true_x = []
 all_true_y = []
 all_false_x = []
 all_false_y = []
-test_size = 300
+test_size = 1000
 for i in range(test_size):
-    file = open("Points/predicted-false-" + str(i) + ".txt", "r")
+    file = open("Points2/predicted-false" + str(i) + ".txt.txt", "r")
     x = []
     y = []
 
@@ -23,7 +23,7 @@ for i in range(test_size):
     all_false_x.append(x)
     all_false_y.append(y)
 
-    file = open("Points/predicted-true-" + str(i) + ".txt", "r")
+    file = open("Points2/predicted-true" + str(i) + ".txt.txt", "r")
     x = []
     y = []
 
@@ -37,7 +37,7 @@ for i in range(test_size):
     all_true_y.append(y)
 
 
-for i in range(test_size):
+for i in range(299, test_size, 20):
     print(i, '\r')
     x = all_false_x[i]
     y = all_false_y[i]
@@ -55,6 +55,6 @@ for i in range(test_size):
     plt.title('Predictions')
     # position the legend on the upper left
     plt.legend(loc='upper left')
-    plt.pause(0.01)
+    plt.pause(0.001)
     plt.clf()
 plt.show()

@@ -1,6 +1,6 @@
 import Functions.MSE;
 import Functions.Relu;
-import Functions.Sigmoid;
+import Functions.Tanh;
 import Matrix.Matrix;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ public class IsInCircle {
     private static double radius = 11.0;
     private static double circleX = 0;
     private static double circleY = 0;
-    private static Random random = new Random();
+    private static Random random = new Random(1);
     private static List<Matrix> XTestE = new ArrayList<>();
     private static List<Matrix> YTestE = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class IsInCircle {
     }
 
     public static void main(String[] args) {
-        initTestData();
+//        initTestData();
         List<Matrix> X = new ArrayList<>();
         List<Matrix> Y = new ArrayList<>();
         for (int i = 0; i < 10000; i++) {
@@ -84,17 +84,6 @@ public class IsInCircle {
             Y.add(y);
         }
 
-        Model model = new Model(64, new MSE(), 0.05);
-        model.add(2, new Relu());
-        model.add(16, new Relu());
-        model.add(32, new Sigmoid());
-//        model.add(64, new Sigmoid());
-//        model.add(32, new Sigmoid());
-        model.add(16, new Sigmoid());
-        model.add(1, new Sigmoid());
-
-        model.trainModel(X, Y, 300);
-        System.out.println("----------TEST-----------");
         List<Matrix> XTest = new ArrayList<>();
         List<Matrix> YTest = new ArrayList<>();
         double accuracy = 0;
@@ -113,6 +102,19 @@ public class IsInCircle {
             }
             YTest.add(y);
         }
+
+        Model model = new Model(64, new MSE(), 0.01);
+        model.add(2, new Relu());
+        model.add(16, new Relu());
+        model.add(32, new Tanh());
+//        model.add(64, new Sigmoid());
+//        model.add(32, new Sigmoid());
+        model.add(16, new Tanh());
+        model.add(1, new Tanh());
+
+        model.trainModel(X, Y, 1000, XTest, YTest);
+        System.out.println("----------TEST-----------");
+
 
         double avgErrorRadius = 0;
         int numOfError = 0;

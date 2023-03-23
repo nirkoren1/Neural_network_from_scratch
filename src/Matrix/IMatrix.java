@@ -25,4 +25,6 @@ public interface IMatrix {
     public static Matrix diagonalizeVector(Double[] vector) {
         return null;
     }
+
+    public static Matrix dotElementWise(Matrix first, Matrix second) {return null;}
 }

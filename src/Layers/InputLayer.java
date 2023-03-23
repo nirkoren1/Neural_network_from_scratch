@@ -22,9 +22,15 @@ public class InputLayer implements Layer {
     }
 
     @Override
-    public Matrix getNodes() {
+    public Matrix getPreActFunc() {
         return this.nodes;
     }
+
+    @Override
+    public Matrix getPostActFunc() {return this.nodes;}
+
+    @Override
+    public Matrix getWeights() {return new Matrix(0, 0);}
 
     @Override
     public int getLayerSize() {

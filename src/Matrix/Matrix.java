@@ -5,7 +5,7 @@ public class Matrix implements IMatrix {
     private int rows;
     private int columns;
     private Double[][] values;
-    private Random random = new Random();
+    private Random random = new Random(1);
 
     public Matrix(int rows, int columns) {
         this.rows = rows;
@@ -73,17 +73,39 @@ public class Matrix implements IMatrix {
                     second.getRows() + ", " + second.getColumns() + ")");
             return null;
         }
-        Double[][] newValues = new Double[first.getRows()][second.getColumns()];
-        for (int i = 0; i < first.getRows(); i++) {
-            for (int j = 0; j < second.getColumns(); j++) {
+        int firstRows = first.getRows();
+        int secondCols = second.getColumns();
+        int firstCols = first.getColumns();
+        Double[][] firstValues = first.getValues();
+        Double[][] secondValues = second.getValues();
+        Double[][] newValues = new Double[firstRows][secondCols];
+        for (int i = 0; i < firstRows; i++) {
+            for (int j = 0; j < secondCols; j++) {
                 double val = 0;
-                for (int k = 0; k < first.getColumns(); k++) {
-                    val += first.getValues()[i][k] * second.getValues()[k][j];
+                for (int k = 0; k < firstCols; k++) {
+                    val += firstValues[i][k] * secondValues[k][j];
                 }
                 newValues[i][j] = val;
             }
         }
-        return new Matrix(first.getRows(), second.getColumns(), newValues);
+        return new Matrix(firstRows, secondCols, newValues);
+    }
+
+    public static Matrix dotElementWise(Matrix first, Matrix second) {
+        if (first.getRows() != second.getRows() || first.getColumns() != second.getColumns()) {
+            System.out.println("matrix dot doesn't match for shape (" + first.getRows() + ", " + first.getColumns() + ")  (" +
+                    second.getRows() + ", " + second.getColumns() + ")");
+            return null;
+        }
+        int firstRows = first.getRows();
+        int firstCols = first.getColumns();
+        Double[][] newValues = new Double[firstRows][firstCols];
+        for (int i = 0; i < firstRows; i++) {
+            for (int j = 0; j < firstCols; j++) {
+                newValues[i][j] = first.getValues()[i][j] * second.getValues()[i][j];
+            }
+        }
+        return new Matrix(firstRows, firstCols, newValues);
     }
 
     public static Matrix multiply(Matrix first, double scalar) {
@@ -120,6 +142,24 @@ public class Matrix implements IMatrix {
                     out.getValues()[i][j] = 0.0;
                 }
             }
+        }
+        return out;
+    }
+
+    public static Matrix columnDuplicates(Double[] vector, int numOfCols) {
+        Matrix out = new Matrix(vector.length, numOfCols);
+        for (int i = 0; i < vector.length; i++) {
+            for (int j = 0; j < numOfCols; j++) {
+                out.getValues()[i][j] = vector[j];
+            }
+        }
+        return out;
+    }
+
+    public static Matrix get1RowVec(int numOfCols) {
+        Matrix out = new Matrix(1, numOfCols);
+        for (int i = 0; i < numOfCols; i++) {
+            out.getValues()[0][i] = 1.0;
         }
         return out;
     }

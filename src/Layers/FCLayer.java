@@ -8,19 +8,23 @@ public class FCLayer implements Layer {
     private Matrix gradientW;
     private Matrix gradientB;
     private Matrix biases;
-    private Matrix nodes;
+    private Matrix preActFunc;
+    private Matrix postActFunc;
+    private Matrix inputs;
     private Function activationFunc;
     private Layer prevLayer;
     private int layerSize;
 
     public FCLayer(int previousLayerSize, int LayerSize, Function activationFunc, Layer prevLayer) {
-        this.nodes = new Matrix(LayerSize, 1);
+        this.preActFunc = new Matrix(LayerSize, 1);
+        this.postActFunc = new Matrix(LayerSize, 1);
+        this.inputs = new Matrix(LayerSize, 1);
         this.activationFunc = activationFunc;
-        this.weights = new Matrix(LayerSize, previousLayerSize);
+        this.weights = Matrix.multiply(new Matrix(LayerSize, previousLayerSize), 0.1);
         this.gradientW = new Matrix(LayerSize, previousLayerSize);
         this.gradientB = new Matrix(LayerSize, 1);
         this.initGradients();
-        this.biases = new Matrix(LayerSize, 1);
+        this.biases = Matrix.multiply(new Matrix(LayerSize, 1), 0);
         this.prevLayer = prevLayer;
         this.layerSize = LayerSize;
     }
@@ -29,8 +33,16 @@ public class FCLayer implements Layer {
         return layerSize;
     }
 
-    public Matrix getNodes() {
-        return this.nodes;
+    public Matrix getPreActFunc() {
+        return this.preActFunc;
+    }
+
+    public Matrix getPostActFunc() {
+        return postActFunc;
+    }
+
+    public Matrix getWeights() {
+        return weights;
     }
 
     public void initGradients() {
@@ -47,35 +59,47 @@ public class FCLayer implements Layer {
     }
 
     public Matrix feedForward(Matrix inputs) {
+        this.inputs = inputs.copy();
         Matrix out = Matrix.dot(this.weights, inputs);
         out = Matrix.add(out, biases);
-        this.nodes = Matrix.add(out, biases);
+        this.preActFunc = out.copy();
         for (int i = 0; i < out.getRows(); i++) {
             for (int j = 0; j < out.getColumns(); j++) {
                 out.getValues()[i][j] = this.activationFunc.applyOn(out.getValues()[i][j]);
             }
         }
+        this.postActFunc = out.copy();
         return out;
     }
 
     public void derivativeLayer(Matrix nextLayerError) {
-        Double[] primeZ = new Double[this.nodes.getRows()];
-        for (int i = 0; i < this.nodes.getRows(); i++) {
-            primeZ[i] = this.activationFunc.derivativeApplyOn(this.nodes.getValues()[i][0]);
+        Double[][] primeZ = new Double[this.preActFunc.getRows()][1];
+        for (int i = 0; i < this.preActFunc.getRows(); i++) {
+            primeZ[i][0] = this.activationFunc.derivativeApplyOn(this.preActFunc.getValues()[i][0]);
         }
-        Matrix primeZMatrix = Matrix.diagonalizeVector(primeZ);
-        for (int i = 0; i < this.weights.getRows(); i++) {
-            for (int j = 0; j < this.weights.getColumns(); j++) {
-                Matrix E = Matrix.getEMatrix(this.weights.getRows(), this.weights.getColumns(), i, j);
-                this.gradientW.getValues()[i][j] += Matrix.dot(nextLayerError, Matrix.dot(primeZMatrix, Matrix.dot(E,
-                                                                this.prevLayer.getNodes()))).getValues()[0][0];
-            }
-        }
-        for (int i = 0; i < this.biases.getRows(); i++) {
-            Matrix E = Matrix.getEMatrix(this.nodes.getRows(), this.nodes.getColumns(), i, 0);
-            this.gradientB.getValues()[i][0] += Matrix.dot(nextLayerError, Matrix.dot(primeZMatrix, E)).getValues()[0][0];
-        }
-        this.prevLayer.derivativeLayer(Matrix.dot(nextLayerError, Matrix.dot(primeZMatrix, this.weights)));
+        // this is σ'(z_j)
+        Matrix sigmaTagZVec = new Matrix(this.preActFunc.getRows(), 1, primeZ);
+        // σ'(z_j) * ∂C/∂a_j (next layer)
+        Matrix sigmaTimesNext = Matrix.dotElementWise(sigmaTagZVec, nextLayerError);
+        // a_k * σ'(z_j) * ∂C/∂a_j (next layer)
+        Matrix inputsSigmaNext = Matrix.dot(this.inputs, Matrix.trancePose(sigmaTimesNext));
+        // w_jk -> w_kj
+        inputsSigmaNext = Matrix.trancePose(inputsSigmaNext);
+        this.gradientW = Matrix.add(gradientW, inputsSigmaNext);
+//        for (int i = 0; i < this.weights.getRows(); i++) {
+//            for (int j = 0; j < this.weights.getColumns(); j++) {
+//                Matrix E = Matrix.getEMatrix(this.weights.getRows(), this.weights.getColumns(), i, j);
+//                this.gradientW.getValues()[i][j] += Matrix.dot(nextLayerError, Matrix.dot(primeZMatrix, Matrix.dot(E,
+//                                                                this.prevLayer.getPreActFunc()))).getValues()[0][0];
+//            }
+//        }
+//        for (int i = 0; i < this.biases.getRows(); i++) {
+//            Matrix E = Matrix.getEMatrix(this.preActFunc.getRows(), this.preActFunc.getColumns(), i, 0);
+//            this.gradientB.getValues()[i][0] += Matrix.dot(nextLayerError, Matrix.dot(primeZMatrix, E)).getValues()[0][0];
+//        }
+        this.gradientB = Matrix.add(this.gradientB, sigmaTimesNext);
+        // passing the error of this layer backwards: w_jk *
+        this.prevLayer.derivativeLayer(Matrix.dot(Matrix.trancePose(this.weights), sigmaTimesNext));
     }
 
     public void updateParameters(double alpha, int batchSize) {
