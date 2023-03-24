@@ -4,9 +4,9 @@ like the following.
 ## Is the point inside the circle
 in this example i trained a model to see if it can predict for a given point if it inside a certain circle
 
-![ezgif-1-4600d3802d](https://user-images.githubusercontent.com/72827063/178108311-066b4192-4250-4bfa-94fc-66f5e8d7b0f5.gif)
+![ezgif-3-03d409786c](https://user-images.githubusercontent.com/72827063/227554432-50ebe35d-dc14-499e-981c-fcc2fe8fac10.gif)
 
-https://user-images.githubusercontent.com/72827063/178071384-a6a8c296-cf43-4e89-acb0-c0d7ef9b000d.mp4
+https://user-images.githubusercontent.com/72827063/227554928-26201dd6-2aac-454e-a8ff-7df8bfc979a1.mp4
 
 ## Linear regression
 A simple linear regression to y=2x+1
