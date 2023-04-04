@@ -1,6 +1,11 @@
 # Neural network from scratch
-In this project i implelemnted a neural network from scratch in java. The model is caple of solving simple problems.
-like the following.
+In this project i implelemnted a neural network from scratch in java. The model is caple of solving simple problems. Deeply inspired by 3blue1brown series of backpropegation.
+## Accuracies obtaind
+| Problem | Accuracy |
+| --- | --- |
+| Xor | 1.0 |
+| Is in circle | 0.971 |
+| Mnist | 0.9281 |
 ## Is the point inside the circle
 in this example i trained a model to see if it can predict for a given point if it inside a certain circle
 
