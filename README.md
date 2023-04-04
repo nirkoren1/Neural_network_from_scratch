@@ -14,3 +14,9 @@ A simple linear regression to y=2x+1
 
 https://user-images.githubusercontent.com/72827063/178108501-6a0e363b-338d-461a-a3a2-48f84b2fc63c.mp4
 
+## Mnist
+Notebook Demo - https://colab.research.google.com/drive/1o3eREgLI8Gqj-EECu5JGoMsUBXKsapqz#scrollTo=m6KbTRdfCAur
+
+upload the zip file [MnistNetwork.zip](https://github.com/nirkoren1/Neural_network_from_scratch/files/11148689/MnistNetwork.zip) to "/content" and run
+
+
