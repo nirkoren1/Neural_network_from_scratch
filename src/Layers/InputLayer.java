@@ -2,7 +2,9 @@ package Layers;
 
 import Matrix.Matrix;
 
-public class InputLayer implements Layer {
+import java.io.Serializable;
+
+public class InputLayer implements Layer, Serializable {
     private Matrix nodes;
     private int layerSize;
 

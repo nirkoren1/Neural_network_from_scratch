@@ -4,11 +4,13 @@ import Layers.FCLayer;
 import Layers.InputLayer;
 import Layers.Layer;
 import Matrix.Matrix;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Model {
+public class Model implements Serializable {
     private List<Layer> layers;
     private int batchSize;
     private CostFunction costFunction;
@@ -46,7 +48,7 @@ public class Model {
     }
     double totalError = 0;
     public void backPorpegateBatch(List<Matrix> predictedBatch, List<Matrix> realValueBatch, List<Matrix> validationX,
-                                   List<Matrix> validationY) {
+                                   List<Matrix> validationY, boolean printError) {
         totalError = 0;
         for (Layer layer: this.layers) {
             layer.initGradients();
@@ -57,6 +59,10 @@ public class Model {
         for (Layer layer: this.layers) {
             layer.updateParameters(this.learningRate, this.batchSize);
         }
+        if (!printError) {
+            System.out.println("");
+            return;
+        }
         for (int i = 0; i < validationX.size(); i++) {
             double xPredict = feedForward(validationX.get(i)).getValues()[0][0];
             double yTrue = validationY.get(i).getValues()[0][0];
@@ -66,8 +72,35 @@ public class Model {
         System.out.println(" Total error = " + totalError);
     }
 
+    public void saveModel(String filename) throws IOException {
+        FileOutputStream file = new FileOutputStream(filename);
+        ObjectOutputStream out = new ObjectOutputStream(file);
+
+        out.writeObject(this);
+
+        out.close();
+        file.close();
+        System.out.println("Model saved in " + filename);
+    }
+
+    public void setLearningRate(double lr) {
+        this.learningRate = lr;
+    }
+
+    public static Model loadModel(String filename) throws IOException, ClassNotFoundException {
+        FileInputStream file = new FileInputStream(filename);
+        ObjectInputStream in = new ObjectInputStream(file);
+
+        // Method for deserialization of object
+        Model model = (Model) in.readObject();
+
+        in.close();
+        file.close();
+        return model;
+    }
+
     public void trainModel(List<Matrix> inputs, List<Matrix> realValues, int epochs, List<Matrix> validationX,
-                           List<Matrix> validationY) {
+                           List<Matrix> validationY, int printErrorEvery) {
         for (int j = 0; j < epochs; j++) {
             List<Matrix> batchInputs = new ArrayList<>();
             List<Matrix> batchRealValues = new ArrayList<>();
@@ -77,27 +110,28 @@ public class Model {
                 batchRealValues.add(realValues.get(randIndex));
             }
             System.out.print("epoch: " + j + " ");
-            this.backPorpegateBatch(batchInputs, batchRealValues, validationX, validationY);
+            boolean printError = (j + 1) % printErrorEvery == 0;
+            this.backPorpegateBatch(batchInputs, batchRealValues, validationX, validationY, printError);
 //            RegressionEx.writePointFile(this, j);
-            int testSize = validationX.size();
-            List<Matrix> XTest = validationX;
-            Double[] xPredictsTrue = new Double[testSize];
-            Double[] yPredictsTrue = new Double[testSize];
-            Double[] xPredictsFalse = new Double[testSize];
-            Double[] yPredictsFalse = new Double[testSize];
-            for (int i = 0; i < testSize; i++) {
-                if (this.feedForward(XTest.get(i)).getValues()[0][0] > 0) {
-                    xPredictsTrue[i] = XTest.get(i).getValues()[0][0];
-                    yPredictsTrue[i] = XTest.get(i).getValues()[1][0];
-                } else {
-                    xPredictsFalse[i] = XTest.get(i).getValues()[0][0];
-                    yPredictsFalse[i] = XTest.get(i).getValues()[1][0];
-                }
-            }
-            PointsWriter pointsWriter = new PointsWriter(xPredictsTrue, yPredictsTrue, testSize, "predicted-true" + j + ".txt");
-            pointsWriter.writePoints();
-            pointsWriter = new PointsWriter(xPredictsFalse, yPredictsFalse, testSize, "predicted-false" + j + ".txt");
-            pointsWriter.writePoints();
+//            int testSize = validationX.size();
+//            List<Matrix> XTest = validationX;
+//            Double[] xPredictsTrue = new Double[testSize];
+//            Double[] yPredictsTrue = new Double[testSize];
+//            Double[] xPredictsFalse = new Double[testSize];
+//            Double[] yPredictsFalse = new Double[testSize];
+//            for (int i = 0; i < testSize; i++) {
+//                if (this.feedForward(XTest.get(i)).getValues()[0][0] > 0) {
+//                    xPredictsTrue[i] = XTest.get(i).getValues()[0][0];
+//                    yPredictsTrue[i] = XTest.get(i).getValues()[1][0];
+//                } else {
+//                    xPredictsFalse[i] = XTest.get(i).getValues()[0][0];
+//                    yPredictsFalse[i] = XTest.get(i).getValues()[1][0];
+//                }
+//            }
+//            PointsWriter pointsWriter = new PointsWriter(xPredictsTrue, yPredictsTrue, testSize, "predicted-true" + j + ".txt");
+//            pointsWriter.writePoints();
+//            pointsWriter = new PointsWriter(xPredictsFalse, yPredictsFalse, testSize, "predicted-false" + j + ".txt");
+//            pointsWriter.writePoints();
         }
     }
 }

@@ -1,7 +1,8 @@
 package Matrix;
+import java.io.Serializable;
 import java.util.Random;
 
-public class Matrix implements IMatrix {
+public class Matrix implements IMatrix, Serializable {
     private int rows;
     private int columns;
     private Double[][] values;
@@ -108,6 +109,23 @@ public class Matrix implements IMatrix {
         return new Matrix(firstRows, firstCols, newValues);
     }
 
+    public static Matrix divideElementWise(Matrix first, Matrix second) {
+        if (first.getRows() != second.getRows() || first.getColumns() != second.getColumns()) {
+            System.out.println("matrix dot doesn't match for shape (" + first.getRows() + ", " + first.getColumns() + ")  (" +
+                    second.getRows() + ", " + second.getColumns() + ")");
+            return null;
+        }
+        int firstRows = first.getRows();
+        int firstCols = first.getColumns();
+        Double[][] newValues = new Double[firstRows][firstCols];
+        for (int i = 0; i < firstRows; i++) {
+            for (int j = 0; j < firstCols; j++) {
+                newValues[i][j] = first.getValues()[i][j] / second.getValues()[i][j];
+            }
+        }
+        return new Matrix(firstRows, firstCols, newValues);
+    }
+
     public static Matrix multiply(Matrix first, double scalar) {
         Double[][] newValues = first.getValues().clone();
         for (int i = 0; i < first.getRows(); i++) {
@@ -127,6 +145,19 @@ public class Matrix implements IMatrix {
                 } else {
                     out.getValues()[k][l] = 0.0;
                 }
+            }
+        }
+        return out;
+    }
+
+    public static Matrix identity(int rows, int cols) {
+        Matrix out = new Matrix(rows, cols);
+        for (int i = 0; i < out.getRows(); i++) {
+            for (int j = 0; j < out.getColumns(); j++) {
+                if (i == j)
+                    out.getValues()[i][j] = 1.0;
+                else
+                    out.getValues()[i][j] = 0.0;
             }
         }
         return out;
@@ -175,6 +206,10 @@ public class Matrix implements IMatrix {
             out.append("\n");
         }
         return out.toString();
+    }
+
+    public void print() {
+        System.out.println(this.toString());
     }
 
     public Matrix copy() {

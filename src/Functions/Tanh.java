@@ -1,13 +1,33 @@
 package Functions;
 
+import Matrix.Matrix;
+
 public class Tanh implements Function {
     @Override
-    public double applyOn(double input) {
-        return (Math.exp(input) - Math.exp(-1 * input)) / (Math.exp(input) + Math.exp(-1 * input));
+    public Matrix applyOn(Matrix input) {
+        Matrix out = new Matrix(input.getRows(), input.getColumns());
+        for (int i = 0; i < out.getRows(); i++) {
+            for (int j = 0; j < out.getColumns(); j++) {
+                double val = input.getValues()[i][j];
+                out.getValues()[i][j] = (Math.exp(val) - Math.exp(-1 * val)) / (Math.exp(val) + Math.exp(-1 * val));
+            }
+        }
+        return out;
     }
 
     @Override
-    public double derivativeApplyOn(double input) {
-        return 1 - Math.pow(this.applyOn(input), 2);
+    public Matrix derivativeApplyOn(Matrix input) {
+        Matrix out = new Matrix(input.getRows(), input.getColumns());
+        for (int i = 0; i < out.getRows(); i++) {
+            for (int j = 0; j < out.getColumns(); j++) {
+                out.getValues()[i][j] = 1.0;
+            }
+        }
+        return Matrix.add(out, Matrix.multiply(Matrix.dotElementWise(this.applyOn(input), this.applyOn(input)), -1));
+    }
+
+    @Override
+    public double gain() {
+        return 5.0 / 3;
     }
 }

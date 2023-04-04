@@ -1,6 +1,9 @@
 package Functions;
 
+import Matrix.Matrix;
+
 public interface Function {
-    public double applyOn(double input);
-    public double derivativeApplyOn(double input);
+    public Matrix applyOn(Matrix input);
+    public Matrix derivativeApplyOn(Matrix input);
+    public double gain();
 }

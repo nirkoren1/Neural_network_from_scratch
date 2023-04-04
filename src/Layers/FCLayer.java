@@ -3,7 +3,9 @@ package Layers;
 import Functions.Function;
 import Matrix.Matrix;
 
-public class FCLayer implements Layer {
+import java.io.Serializable;
+
+public class FCLayer implements Layer, Serializable {
     private Matrix weights;
     private Matrix gradientW;
     private Matrix gradientB;
@@ -63,42 +65,29 @@ public class FCLayer implements Layer {
         Matrix out = Matrix.dot(this.weights, inputs);
         out = Matrix.add(out, biases);
         this.preActFunc = out.copy();
-        for (int i = 0; i < out.getRows(); i++) {
-            for (int j = 0; j < out.getColumns(); j++) {
-                out.getValues()[i][j] = this.activationFunc.applyOn(out.getValues()[i][j]);
-            }
-        }
+        out = this.activationFunc.applyOn(out);
         this.postActFunc = out.copy();
         return out;
     }
 
     public void derivativeLayer(Matrix nextLayerError) {
-        Double[][] primeZ = new Double[this.preActFunc.getRows()][1];
-        for (int i = 0; i < this.preActFunc.getRows(); i++) {
-            primeZ[i][0] = this.activationFunc.derivativeApplyOn(this.preActFunc.getValues()[i][0]);
-        }
+        Matrix primeZ = this.preActFunc.copy();
         // this is σ'(z_j)
-        Matrix sigmaTagZVec = new Matrix(this.preActFunc.getRows(), 1, primeZ);
+        Matrix sigmaTagZVec = this.activationFunc.derivativeApplyOn(primeZ);
         // σ'(z_j) * ∂C/∂a_j (next layer)
-        Matrix sigmaTimesNext = Matrix.dotElementWise(sigmaTagZVec, nextLayerError);
+        Matrix sigmaTimesNext;
+        if (sigmaTagZVec.getColumns() > 1)
+            sigmaTimesNext = Matrix.dot(sigmaTagZVec, nextLayerError);
+        else
+            sigmaTimesNext = Matrix.dotElementWise(sigmaTagZVec, nextLayerError);
         // a_k * σ'(z_j) * ∂C/∂a_j (next layer)
         Matrix inputsSigmaNext = Matrix.dot(this.inputs, Matrix.trancePose(sigmaTimesNext));
         // w_jk -> w_kj
         inputsSigmaNext = Matrix.trancePose(inputsSigmaNext);
+        // adding the current sample gradient to the batch gradient
         this.gradientW = Matrix.add(gradientW, inputsSigmaNext);
-//        for (int i = 0; i < this.weights.getRows(); i++) {
-//            for (int j = 0; j < this.weights.getColumns(); j++) {
-//                Matrix E = Matrix.getEMatrix(this.weights.getRows(), this.weights.getColumns(), i, j);
-//                this.gradientW.getValues()[i][j] += Matrix.dot(nextLayerError, Matrix.dot(primeZMatrix, Matrix.dot(E,
-//                                                                this.prevLayer.getPreActFunc()))).getValues()[0][0];
-//            }
-//        }
-//        for (int i = 0; i < this.biases.getRows(); i++) {
-//            Matrix E = Matrix.getEMatrix(this.preActFunc.getRows(), this.preActFunc.getColumns(), i, 0);
-//            this.gradientB.getValues()[i][0] += Matrix.dot(nextLayerError, Matrix.dot(primeZMatrix, E)).getValues()[0][0];
-//        }
         this.gradientB = Matrix.add(this.gradientB, sigmaTimesNext);
-        // passing the error of this layer backwards: w_jk *
+        // passing the error of this layer backwards: w_jk * σ'(z_j) * ∂C/∂a_j (next layer)
         this.prevLayer.derivativeLayer(Matrix.dot(Matrix.trancePose(this.weights), sigmaTimesNext));
     }
 

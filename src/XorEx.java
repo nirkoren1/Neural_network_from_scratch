@@ -44,7 +44,7 @@ public class XorEx {
 //        model.add(16, new Sigmoid());
         model.add(1, new Relu() );
 
-        model.trainModel(X, Y, 10000, XTest, YTest);
+        model.trainModel(X, Y, 10000, XTest, YTest, 1);
         System.out.println("----------TEST-----------");
         double totalError = 0;
         double accuracy = 0;

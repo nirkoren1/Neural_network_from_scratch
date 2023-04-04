@@ -27,4 +27,10 @@ public interface IMatrix {
     }
 
     public static Matrix dotElementWise(Matrix first, Matrix second) {return null;}
+
+    public static Matrix divideElementWise(Matrix first, Matrix second) {return null;}
+
+    public static Matrix identity(int rows, int cols) {return null;}
+
+    public void print();
 }

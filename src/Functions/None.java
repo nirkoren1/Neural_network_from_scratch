@@ -1,10 +1,17 @@
 package Functions;
 
+import Matrix.Matrix;
+
 public class None implements Function {
-    public double applyOn(double input) {
-        return input;
+    public Matrix applyOn(Matrix input) {
+        return input.copy();
     }
-    public double derivativeApplyOn(double input) {
-        return 1.0;
+    public Matrix derivativeApplyOn(Matrix input) {
+        return Matrix.trancePose(Matrix.get1RowVec(input.getRows()));
+    }
+
+    @Override
+    public double gain() {
+        return 1;
     }
 }

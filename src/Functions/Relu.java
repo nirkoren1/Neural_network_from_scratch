@@ -1,14 +1,37 @@
 package Functions;
 
-public class Relu implements Function {
-    public double applyOn(double input) {
-        if (input <= 0)
-            return 0.0;
-        return input;
+import Matrix.Matrix;
+
+import java.io.Serializable;
+
+public class Relu implements Function, Serializable {
+    public Matrix applyOn(Matrix input) {
+        Matrix out = new Matrix(input.getRows(), input.getColumns());
+        for (int i = 0; i < out.getRows(); i++) {
+            for (int j = 0; j < out.getColumns(); j++) {
+                if (input.getValues()[i][j] <= 0)
+                    out.getValues()[i][j] = 0.0;
+                else
+                    out.getValues()[i][j] = input.getValues()[i][j];
+            }
+        }
+        return out;
     }
-    public double derivativeApplyOn(double input) {
-        if (input < 0)
-            return 0.0;
-        return 1.0;
+    public Matrix derivativeApplyOn(Matrix input) {
+        Matrix out = new Matrix(input.getRows(), input.getColumns());
+        for (int i = 0; i < out.getRows(); i++) {
+            for (int j = 0; j < out.getColumns(); j++) {
+                if (input.getValues()[i][j] < 0)
+                    out.getValues()[i][j] = 0.0;
+                else
+                    out.getValues()[i][j] = 1.0;
+            }
+        }
+        return out;
+    }
+
+    @Override
+    public double gain() {
+        return Math.sqrt(2);
     }
 }

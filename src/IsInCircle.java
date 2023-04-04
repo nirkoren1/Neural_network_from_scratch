@@ -112,7 +112,7 @@ public class IsInCircle {
         model.add(16, new Tanh());
         model.add(1, new Tanh());
 
-        model.trainModel(X, Y, 1000, XTest, YTest);
+        model.trainModel(X, Y, 1000, XTest, YTest, 1);
         System.out.println("----------TEST-----------");
 
 

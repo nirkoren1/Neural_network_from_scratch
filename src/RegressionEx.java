@@ -55,15 +55,15 @@ public class RegressionEx {
         }
 
 
-        Model model = new Model(16, new MSE(), 0.05);
+        Model model = new Model(16, new MSE(), 0.01);
         model.add(1, new Relu());
         model.add(16, new Relu());
 //        model.add(32, new Relu());
 //        model.add(32, new Relu());
-        model.add(16, new Relu());
+        model.add(16, new None());
         model.add(1, new None());
 
-        model.trainModel(X, Y, 200, XTest, YTest);
+        model.trainModel(X, Y, 3, XTest, YTest, 1);
 
         System.out.println("----------TEST-----------");
 
