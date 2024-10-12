@@ -7,6 +7,7 @@ import Matrix.Matrix;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -41,35 +42,24 @@ public class Model implements Serializable {
         return result;
     }
 
-    public double backPorpegateSample(Matrix inputs, Matrix realValue) {
+    public double backPropagateSample(Matrix inputs, Matrix realValue) {
         Matrix result = this.feedForward(inputs.copy());
         this.layers.get(this.layers.size() - 1).derivativeLayer(this.costFunction.derCost(result, realValue.copy()));
         return this.costFunction.cost(result.copy(), realValue.copy());
     }
     double totalError = 0;
-    public void backPorpegateBatch(List<Matrix> predictedBatch, List<Matrix> realValueBatch, List<Matrix> validationX,
-                                   List<Matrix> validationY, boolean printError) {
+    public void backPropagateBatch(List<Matrix> predictedBatch, List<Matrix> realValueBatch, List<Matrix> validationX,
+                                   List<Matrix> validationY) {
         totalError = 0;
         for (Layer layer: this.layers) {
             layer.initGradients();
         }
         for (int i = 0; i < this.batchSize; i++) {
-            backPorpegateSample(predictedBatch.get(i), realValueBatch.get(i));
+            backPropagateSample(predictedBatch.get(i), realValueBatch.get(i));
         }
         for (Layer layer: this.layers) {
             layer.updateParameters(this.learningRate, this.batchSize);
         }
-        if (!printError) {
-            System.out.println("");
-            return;
-        }
-        for (int i = 0; i < validationX.size(); i++) {
-            double xPredict = feedForward(validationX.get(i)).getValues()[0][0];
-            double yTrue = validationY.get(i).getValues()[0][0];
-            totalError += Math.pow(xPredict - yTrue, 2);
-        }
-        totalError /= validationX.size();
-        System.out.println(" Total error = " + totalError);
     }
 
     public void saveModel(String filename) throws IOException {
@@ -101,18 +91,41 @@ public class Model implements Serializable {
 
     public void trainModel(List<Matrix> inputs, List<Matrix> realValues, int epochs, List<Matrix> validationX,
                            List<Matrix> validationY, int printErrorEvery) {
+        List<Matrix> shuffledBatches = new ArrayList<>(inputs);
+        int nBatches = (int) Math.ceil(inputs.size() / this.batchSize);
         for (int j = 0; j < epochs; j++) {
-            List<Matrix> batchInputs = new ArrayList<>();
-            List<Matrix> batchRealValues = new ArrayList<>();
-            for (int i = 0; i < this.batchSize; i++) {
-                int randIndex = rand.nextInt(inputs.size());
-                batchInputs.add(inputs.get(randIndex));
-                batchRealValues.add(realValues.get(randIndex));
+            Collections.shuffle(shuffledBatches);
+
+            for (int batch = 0; batch < nBatches; batch++) {
+                List<Matrix> batchInputs = inputs.subList(batch*this.batchSize, Math.max((batch + 1)*this.batchSize,
+                        inputs.size()));
+                List<Matrix> batchRealValues = realValues.subList(batch*this.batchSize, Math.max((batch + 1)*this.batchSize,
+                        realValues.size()));
+
+
+                this.backPropagateBatch(batchInputs, batchRealValues, validationX, validationY);
             }
+
+
             System.out.print("epoch: " + j + " ");
             boolean printError = (j + 1) % printErrorEvery == 0;
-            this.backPorpegateBatch(batchInputs, batchRealValues, validationX, validationY, printError);
+            if (!printError) {
+                System.out.println("");
+                return;
+            }
+            for (int i = 0; i < validationX.size(); i++) {
+                totalError += this.costFunction.cost(this.feedForward(validationX.get(i)), validationY.get(i));
+            }
+            totalError /= validationX.size();
+            System.out.println(" Total error = " + totalError);
+
+            // to plot the regression demo
 //            RegressionEx.writePointFile(this, j);
+
+            // to plot the isInCircle demo
+            IsInCircle.writePointFile(this, j);
+
+
 //            int testSize = validationX.size();
 //            List<Matrix> XTest = validationX;
 //            Double[] xPredictsTrue = new Double[testSize];
@@ -132,6 +145,7 @@ public class Model implements Serializable {
 //            pointsWriter.writePoints();
 //            pointsWriter = new PointsWriter(xPredictsFalse, yPredictsFalse, testSize, "predicted-false" + j + ".txt");
 //            pointsWriter.writePoints();
+
         }
     }
 }

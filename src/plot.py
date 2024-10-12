@@ -8,9 +8,9 @@ all_true_x = []
 all_true_y = []
 all_false_x = []
 all_false_y = []
-test_size = 1000
+test_size = 30
 for i in range(test_size):
-    file = open("Points2/predicted-false" + str(i) + ".txt.txt", "r")
+    file = open("Points2/predicted-false-" + str(i) + ".txt", "r")
     x = []
     y = []
 
@@ -23,7 +23,7 @@ for i in range(test_size):
     all_false_x.append(x)
     all_false_y.append(y)
 
-    file = open("Points2/predicted-true" + str(i) + ".txt.txt", "r")
+    file = open("Points2/predicted-true-" + str(i) + ".txt", "r")
     x = []
     y = []
 
@@ -37,7 +37,7 @@ for i in range(test_size):
     all_true_y.append(y)
 
 
-for i in range(299, test_size, 20):
+for i in range(0, test_size, 2):
     print(i, '\r')
     x = all_false_x[i]
     y = all_false_y[i]
@@ -55,6 +55,24 @@ for i in range(299, test_size, 20):
     plt.title('Predictions')
     # position the legend on the upper left
     plt.legend(loc='upper left')
-    plt.pause(0.001)
+    plt.pause(0.0001)
     plt.clf()
+
+i = test_size - 1
+x = all_false_x[i]
+y = all_false_y[i]
+# sctatter plot
+plt.scatter(x, y, marker='o', color='red', label='Predicted False')
+
+x = all_true_x[i]
+y = all_true_y[i]
+plt.scatter(x, y, marker='o', color='blue', label='Predicted True')
+
+# draw a circle at the origin of the coordinate system with radius
+for i in range(0, 360, 1):
+    plt.scatter([circle_x + radius * np.cos(i)], [circle_y + radius * np.sin(i)], color='black')
+
+plt.title('Predictions')
+# position the legend on the upper left
+plt.legend(loc='upper left')
 plt.show()

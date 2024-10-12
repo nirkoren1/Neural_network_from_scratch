@@ -23,7 +23,7 @@ public class Tanh implements Function {
                 out.getValues()[i][j] = 1.0;
             }
         }
-        return Matrix.add(out, Matrix.multiply(Matrix.dotElementWise(this.applyOn(input), this.applyOn(input)), -1));
+        return Matrix.add(out, Matrix.multiply(Matrix.multiplyElementWise(this.applyOn(input), this.applyOn(input)), -1));
     }
 
     @Override

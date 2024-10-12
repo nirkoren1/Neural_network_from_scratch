@@ -9,10 +9,7 @@ public class Relu implements Function, Serializable {
         Matrix out = new Matrix(input.getRows(), input.getColumns());
         for (int i = 0; i < out.getRows(); i++) {
             for (int j = 0; j < out.getColumns(); j++) {
-                if (input.getValues()[i][j] <= 0)
-                    out.getValues()[i][j] = 0.0;
-                else
-                    out.getValues()[i][j] = input.getValues()[i][j];
+                out.getValues()[i][j] = Math.max(0.0, input.getValues()[i][j]);
             }
         }
         return out;
@@ -21,7 +18,7 @@ public class Relu implements Function, Serializable {
         Matrix out = new Matrix(input.getRows(), input.getColumns());
         for (int i = 0; i < out.getRows(); i++) {
             for (int j = 0; j < out.getColumns(); j++) {
-                if (input.getValues()[i][j] < 0)
+                if (input.getValues()[i][j] <= 0)
                     out.getValues()[i][j] = 0.0;
                 else
                     out.getValues()[i][j] = 1.0;
@@ -33,5 +30,12 @@ public class Relu implements Function, Serializable {
     @Override
     public double gain() {
         return Math.sqrt(2);
+    }
+
+    public static void main(String[] args) {
+        Matrix ex = new Matrix(3, 2);
+        ex.print();
+        Relu relu = new Relu();
+        relu.applyOn(ex).print();
     }
 }

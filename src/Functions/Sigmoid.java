@@ -2,7 +2,9 @@ package Functions;
 
 import Matrix.Matrix;
 
-public class Sigmoid implements Function {
+import java.io.Serializable;
+
+public class Sigmoid implements Function, Serializable {
     @Override
     public Matrix applyOn(Matrix input) {
         Matrix out = new Matrix(input.getRows(), input.getColumns());
@@ -22,7 +24,8 @@ public class Sigmoid implements Function {
                 out.getValues()[i][j] = 1.0;
             }
         }
-        return Matrix.add(out, Matrix.multiply(this.applyOn(input), -1));
+        Matrix applied = this.applyOn(input);
+        return Matrix.multiplyElementWise(applied, Matrix.add(out, Matrix.multiply(applied, -1)));
     }
 
     @Override

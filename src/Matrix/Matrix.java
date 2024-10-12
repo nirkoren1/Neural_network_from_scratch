@@ -14,7 +14,8 @@ public class Matrix implements IMatrix, Serializable {
         this.values = new Double[rows][columns];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                this.values[i][j] = -1 + (1 - -1) * random.nextDouble();
+//                this.values[i][j] = -1 + (1 - -1) * random.nextDouble();
+                this.values[i][j] = random.nextGaussian();
             }
         }
     }
@@ -44,7 +45,7 @@ public class Matrix implements IMatrix, Serializable {
         return this.values;
     }
 
-    public static Matrix trancePose(Matrix first) {
+    public static Matrix transpose(Matrix first) {
         Double[][] newValues = new Double[first.getColumns()][first.getRows()];
         for (int i = 0; i < first.getRows(); i++) {
             for (int j = 0; j < first.getColumns(); j++) {
@@ -54,11 +55,10 @@ public class Matrix implements IMatrix, Serializable {
         return new Matrix(first.getColumns(), first.getRows(), newValues);
     }
     public static Matrix add(Matrix first, Matrix second) {
-        if (first.getColumns() != second.getColumns() || first.getRows() != second.getRows()) {
-            System.out.println("matrix add doesn't match for shape (" + first.getRows() + ", " + first.getColumns() + ")  (" +
-                                second.getRows() + ", " + second.getColumns() + ")");
-            return null;
-        }
+        assert first.getColumns() == second.getColumns() && first.getRows() == second.getRows() :
+                String.format("Matrix.add doesn't match for shape (%d, %d) (%d, %d)",
+                        first.getRows(), first.getColumns(), second.getRows(), second.getColumns());;
+
         Double[][] newValues = first.values;
         for (int i = 0; i < first.getRows(); i++) {
             for (int j = 0; j < first.getColumns(); j++) {
@@ -69,11 +69,10 @@ public class Matrix implements IMatrix, Serializable {
     }
 
     public static Matrix dot(Matrix first, Matrix second) {
-        if (first.getColumns() != second.getRows()) {
-            System.out.println("matrix dot doesn't match for shape (" + first.getRows() + ", " + first.getColumns() + ")  (" +
-                    second.getRows() + ", " + second.getColumns() + ")");
-            return null;
-        }
+        assert first.getColumns() == second.getRows() :
+                String.format("Matrix.dot doesn't match for shape (%d, %d) (%d, %d)",
+                        first.getRows(), first.getColumns(), second.getRows(), second.getColumns());
+
         int firstRows = first.getRows();
         int secondCols = second.getColumns();
         int firstCols = first.getColumns();
@@ -92,12 +91,11 @@ public class Matrix implements IMatrix, Serializable {
         return new Matrix(firstRows, secondCols, newValues);
     }
 
-    public static Matrix dotElementWise(Matrix first, Matrix second) {
-        if (first.getRows() != second.getRows() || first.getColumns() != second.getColumns()) {
-            System.out.println("matrix dot doesn't match for shape (" + first.getRows() + ", " + first.getColumns() + ")  (" +
-                    second.getRows() + ", " + second.getColumns() + ")");
-            return null;
-        }
+    public static Matrix multiplyElementWise(Matrix first, Matrix second) {
+        assert first.getRows() == second.getRows() && first.getColumns() == second.getColumns() :
+                String.format("Matrix.multiplyElementWise doesn't match for shape (%d, %d) (%d, %d)",
+                        first.getRows(), first.getColumns(), second.getRows(), second.getColumns());
+
         int firstRows = first.getRows();
         int firstCols = first.getColumns();
         Double[][] newValues = new Double[firstRows][firstCols];
@@ -110,11 +108,10 @@ public class Matrix implements IMatrix, Serializable {
     }
 
     public static Matrix divideElementWise(Matrix first, Matrix second) {
-        if (first.getRows() != second.getRows() || first.getColumns() != second.getColumns()) {
-            System.out.println("matrix dot doesn't match for shape (" + first.getRows() + ", " + first.getColumns() + ")  (" +
-                    second.getRows() + ", " + second.getColumns() + ")");
-            return null;
-        }
+        assert first.getRows() == second.getRows() && first.getColumns() == second.getColumns() :
+                String.format("Matrix.divideElementWise doesn't match for shape (%d, %d) (%d, %d)",
+                        first.getRows(), first.getColumns(), second.getRows(), second.getColumns());
+
         int firstRows = first.getRows();
         int firstCols = first.getColumns();
         Double[][] newValues = new Double[firstRows][firstCols];
@@ -209,7 +206,7 @@ public class Matrix implements IMatrix, Serializable {
     }
 
     public void print() {
-        System.out.println(this.toString());
+        System.out.println(this);
     }
 
     public Matrix copy() {
@@ -218,8 +215,11 @@ public class Matrix implements IMatrix, Serializable {
 
     public static void main(String[] args) {
         Matrix matrix = new Matrix(2, 3);
-        System.out.println(matrix);
-        matrix = Matrix.trancePose(matrix);
-        System.out.println(matrix);
+
+        Matrix matrixT = Matrix.transpose(matrix);
+        matrixT.print();
+        matrix.print();
+        Matrix added = Matrix.dot(matrixT, matrix);
+        added.print();
     }
 }

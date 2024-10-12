@@ -64,7 +64,7 @@ public class MnistEx {
             xTest.add(x);
         }
         sc.close();
-        Model model = new Model(16, new CrossEntropy(), 0.03);
+        Model model = new Model(16, new CrossEntropy(), 0.01);
         model.add(xTrain.get(0).getRows(), new Relu());
         model.add(128, new Relu());
         model.add(64, new Relu());
@@ -73,13 +73,20 @@ public class MnistEx {
         model.add(32, new Relu());
         model.add(10, new Softmax());
 
-        model.trainModel(xTrain, yTrain, 700, xTest.subList(0, 100), yTest.subList(0, 100), 99999999);
+        model.trainModel(xTrain.subList(0, 1000), yTrain.subList(0, 1000), 7, xTest.subList(0, 100), yTest.subList(0, 100), 1);
         model.setLearningRate(0.002);
-        model.trainModel(xTrain, yTrain, 100, xTest.subList(0, 100), yTest.subList(0, 100), 99999999);
+        model.trainModel(xTrain.subList(0, 1000), yTrain.subList(0, 1000), 1, xTest.subList(0, 100), yTest.subList(0, 100), 1);
 
         double acc = 0;
         for (int i = 0; i < xTest.size(); i++) {
             int argMax = predict(model, xTest.get(i));
+            int trueArg = -1;
+            for (int j = 0; j < yTest.get(i).getRows(); j++) {
+                if (yTest.get(i).getValues()[j][0] == 1) {
+                    trueArg = j;
+                }
+            }
+            System.out.printf("true: %d  predicted: %d%n", trueArg, argMax);
             if (yTest.get(i).getValues()[argMax][0] == 1.0)
                 acc += 1.0;
         }

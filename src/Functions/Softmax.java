@@ -33,7 +33,7 @@ public class Softmax implements Function, Serializable {
     @Override
     public Matrix derivativeApplyOn(Matrix input) {
         Matrix out;
-        out = Matrix.dot(input, Matrix.trancePose(input));
+        out = Matrix.dot(input, Matrix.transpose(input));
         out = Matrix.multiply(out, -1);
         Matrix I = Matrix.identity(input.getRows(), input.getRows());
         out = Matrix.add(I, out);

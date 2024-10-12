@@ -19,15 +19,6 @@ public class MnistDemo {
             out[i] = logits.getValues()[i][0];
         }
         return out;
-//        int argMax = 0;
-//        double max = -1;
-//        for (int j = 0; j < logits.getRows(); j++) {
-//            if (logits.getValues()[j][0] > max) {
-//                max = logits.getValues()[j][0];
-//                argMax = j;
-//            }
-//        }
-//        return argMax;
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {

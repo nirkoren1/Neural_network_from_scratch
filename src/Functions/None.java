@@ -7,7 +7,7 @@ public class None implements Function {
         return input.copy();
     }
     public Matrix derivativeApplyOn(Matrix input) {
-        return Matrix.trancePose(Matrix.get1RowVec(input.getRows()));
+        return Matrix.transpose(Matrix.get1RowVec(input.getRows()));
     }
 
     @Override

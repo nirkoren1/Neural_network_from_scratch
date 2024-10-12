@@ -22,7 +22,11 @@ public class FCLayer implements Layer, Serializable {
         this.postActFunc = new Matrix(LayerSize, 1);
         this.inputs = new Matrix(LayerSize, 1);
         this.activationFunc = activationFunc;
-        this.weights = Matrix.multiply(new Matrix(LayerSize, previousLayerSize), 0.1);
+
+        Double scale = activationFunc.gain() / Math.sqrt(previousLayerSize);
+        this.weights = Matrix.multiply(new Matrix(LayerSize, previousLayerSize), scale);
+
+//        this.weights = Matrix.multiply(new Matrix(LayerSize, previousLayerSize), 0.1);
         this.gradientW = new Matrix(LayerSize, previousLayerSize);
         this.gradientB = new Matrix(LayerSize, 1);
         this.initGradients();
@@ -79,16 +83,16 @@ public class FCLayer implements Layer, Serializable {
         if (sigmaTagZVec.getColumns() > 1)
             sigmaTimesNext = Matrix.dot(sigmaTagZVec, nextLayerError);
         else
-            sigmaTimesNext = Matrix.dotElementWise(sigmaTagZVec, nextLayerError);
+            sigmaTimesNext = Matrix.multiplyElementWise(sigmaTagZVec, nextLayerError);
         // a_k * σ'(z_j) * ∂C/∂a_j (next layer)
-        Matrix inputsSigmaNext = Matrix.dot(this.inputs, Matrix.trancePose(sigmaTimesNext));
+        Matrix inputsSigmaNext = Matrix.dot(this.inputs, Matrix.transpose(sigmaTimesNext));
         // w_jk -> w_kj
-        inputsSigmaNext = Matrix.trancePose(inputsSigmaNext);
+        inputsSigmaNext = Matrix.transpose(inputsSigmaNext);
         // adding the current sample gradient to the batch gradient
-        this.gradientW = Matrix.add(gradientW, inputsSigmaNext);
+        this.gradientW = Matrix.add(this.gradientW, inputsSigmaNext);
         this.gradientB = Matrix.add(this.gradientB, sigmaTimesNext);
         // passing the error of this layer backwards: w_jk * σ'(z_j) * ∂C/∂a_j (next layer)
-        this.prevLayer.derivativeLayer(Matrix.dot(Matrix.trancePose(this.weights), sigmaTimesNext));
+        this.prevLayer.derivativeLayer(Matrix.dot(Matrix.transpose(this.weights), sigmaTimesNext));
     }
 
     public void updateParameters(double alpha, int batchSize) {

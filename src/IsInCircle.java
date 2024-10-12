@@ -39,7 +39,7 @@ public class IsInCircle {
         for (int i = 0; i < testSize; i++) {
             double xPredict = model.feedForward(XTestE.get(i)).getValues()[0][0];
             double yTrue = YTestE.get(i).getValues()[0][0];
-            if ((xPredict < 0 && yTrue < 0) || (xPredict > 0 && yTrue > 0)) {
+            if (xPredict * yTrue > 0) {
                 accuracy += 1;
             }
         }
@@ -66,7 +66,7 @@ public class IsInCircle {
     }
 
     public static void main(String[] args) {
-//        initTestData();
+        initTestData();
         List<Matrix> X = new ArrayList<>();
         List<Matrix> Y = new ArrayList<>();
         for (int i = 0; i < 10000; i++) {
@@ -112,7 +112,7 @@ public class IsInCircle {
         model.add(16, new Tanh());
         model.add(1, new Tanh());
 
-        model.trainModel(X, Y, 1000, XTest, YTest, 1);
+        model.trainModel(X, Y, 30, XTest, YTest, 1);
         System.out.println("----------TEST-----------");
 
 
@@ -120,21 +120,15 @@ public class IsInCircle {
         int numOfError = 0;
 
         for (int i = 0; i < testSize; i++) {
-//            System.out.println(XTest.get(i));
-//            System.out.println(YTest.get(i));
-//            System.out.println(model.feedForward(XTest.get(i)));
-//            System.out.println("---------------------");
             double xPredict = model.feedForward(XTest.get(i)).getValues()[0][0];
+
             double yTrue = YTest.get(i).getValues()[0][0];
-            if ((xPredict < 0 && yTrue < 0) || (xPredict > 0 && yTrue > 0)) {
+            if (xPredict * yTrue > 0) {
                 accuracy += 1;
-            } else {
-                System.out.println(XTest.get(i));
+            }
+            else {
                 avgErrorRadius += Math.pow(Math.pow(XTest.get(i).getValues()[0][0] - circleX, 2) + Math.pow(XTest.get(i).getValues()[1][0] - circleY, 2), 0.5);
                 numOfError += 1;
-                System.out.println(YTest.get(i));
-                System.out.println(xPredict);
-                System.out.println("---------------------");
             }
         }
         accuracy /= testSize;

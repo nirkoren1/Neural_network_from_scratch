@@ -1,6 +1,4 @@
-import Functions.MSE;
-import Functions.None;
-import Functions.Relu;
+import Functions.*;
 import Matrix.Matrix;
 
 import java.util.ArrayList;
@@ -11,11 +9,11 @@ public class RegressionEx {
     private static Random random = new Random();
 
     public static void writePointFile(Model model, int index) {
-        int testSize = 10000;
+        int testSize = 20000;
         Double[] all_x = new Double[testSize];
         Double[] all_y = new Double[testSize];
         for (int i = 0; i < testSize; i++) {
-            double x = i / 1000.0;
+            double x = i / 1000.0 - 10.0;
             Matrix xMatrix = new Matrix(1, 1);
             xMatrix.getValues()[0][0] = x;
             double y = model.feedForward(xMatrix).getValues()[0][0];
@@ -55,15 +53,15 @@ public class RegressionEx {
         }
 
 
-        Model model = new Model(16, new MSE(), 0.01);
-        model.add(1, new Relu());
+        Model model = new Model(64, new MSE(), 0.00001);
+        model.add(1, new None());
         model.add(16, new Relu());
-//        model.add(32, new Relu());
-//        model.add(32, new Relu());
+        model.add(32, new Relu());
+        model.add(32, new None());
         model.add(16, new None());
         model.add(1, new None());
 
-        model.trainModel(X, Y, 3, XTest, YTest, 1);
+        model.trainModel(X, Y, 30, XTest, YTest, 1);
 
         System.out.println("----------TEST-----------");
 
@@ -78,6 +76,6 @@ public class RegressionEx {
             System.out.println("---------------------");
         }
         avgError /= testSize;
-        System.out.println("Total error = " + avgError);
+        System.out.println("RMSE error = " + Math.sqrt(avgError));
     }
 }
